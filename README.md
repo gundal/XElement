@@ -73,8 +73,8 @@ XElement username = ui.FE("username");
 XElement password = ui.FE("password");
 XElement login = ui.MFE("button[type='submit']");
 
-username.SendKeys("example-user");
-password.SendKeys("example-value");
+username.SendKeys("user@example.com");
+password.SendKeys("password");
 login.Click();
 ```
 
