@@ -1,0 +1,26 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore library
+        run: dotnet restore src/XElementArchitecture/XElementArchitecture.csproj
+      - name: Build library
+        run: dotnet build src/XElementArchitecture/XElementArchitecture.csproj -c Release --no-restore
+      - name: Restore examples
+        run: dotnet restore examples/XElementArchitecture.Examples.csproj
+      - name: Build examples
+        run: dotnet build examples/XElementArchitecture.Examples.csproj -c Release --no-restore
