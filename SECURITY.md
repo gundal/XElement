@@ -1,5 +1,5 @@
-# Security and disclosure policy
+# Security and historical-source policy
 
-This repository is a portfolio-oriented architecture demonstration and should never contain production credentials, customer data, internal hostnames, employer source code, or private environment configuration.
+This public repository intentionally contains no credentials, private endpoints, customer data, employer configuration, historical binaries or unreviewed private-repository source.
 
-If you discover material that appears sensitive, please do not redistribute it. Contact the repository owner privately so it can be reviewed and removed.
+If you notice information that appears sensitive or employer-specific, please report it privately to the repository owner rather than opening a public issue containing the material.
