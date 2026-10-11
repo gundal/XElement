@@ -1,6 +1,6 @@
 # License / Usage Terms
 
-Copyright © 2026 Leeam Dagan. All rights reserved.
+Copyright © 2014–2026 Leeam Dagan. All rights reserved.
 
 This repository is made publicly available for portfolio review, technical evaluation, and educational inspection only.
 
