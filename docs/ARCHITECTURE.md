@@ -1,86 +1,66 @@
-# Architecture notes
+# Architecture
 
-## Separation of concerns
+## System boundary
 
-```text
-Test / workflow
-      ↓
-Page or component object
-      ↓
-UIWrapper
-      ↓
-XElement
-      ↓
-Selenium IWebElement
-      ↓
-DOM
-```
-
-`XElement` is intentionally **not** a replacement for Page Object / Component Object design.
-
-- **Page/component objects** model the application and expose meaningful actions.
-- **XElement** models the lifecycle of the logical UI element underneath them.
-- **`IWebElement`** is the current Selenium DOM reference and is treated as replaceable state.
-
-## Logical identity vs current DOM state
-
-The central design choice is composition:
+XElement is one layer in a larger automation framework:
 
 ```text
-XElement
- ├─ LocatorChain   ← durable identity
- ├─ ElementState   ← unresolved / resolved / stale
- └─ IWebElement E  ← current replaceable DOM reference
+Tests / Page Objects / semantic CoreFunctions
+                    ↓
+                UIWrapper
+            FE / MFE / FEs
+                    ↓
+                 XElement
+        locator + path + index + E
+                    ↓
+   VerifyPath / VerifyElement / ConcatLocators
+                    ↓
+              Selenium WebDriver
+                    ↓
+                   DOM
+
+Global owns framework runtime/lifecycle policy around those layers.
 ```
 
-An `XElement` remains the same logical object even when the browser replaces the node that its current `IWebElement` points at.
+## Logical identity vs DOM state
 
-## Fast path vs must-exist path
+The central design decision is that a logical element is not identical to the current Selenium DOM pointer.
 
-### `FE` / `Element`
+- `Locator` describes durable identity.
+- `Index` preserves occurrence when multiple matches exist.
+- `Path` is the current resolved Selenium locator strategy.
+- `E` is replaceable DOM state.
+- `Stale`, `Current` and `Ready` model lifecycle/actionability.
 
-One immediate resolution attempt. If the element does not exist yet, the logical `XElement` remains valid and unresolved.
+The same XElement instance can therefore survive a DOM replacement by resolving its retained identity and replacing `E`.
 
-> This element belongs to the workflow; it may not physically exist at this exact instant.
+## Fast path and strong path
 
-### `MFE` / `MustElement`
+`UIWrapper.FE(string)` is the low-cost default. It minimizes implicit-wait cost, prefers non-throwing existence checks, and can return an unresolved logical XElement.
 
-The workflow now requires the element. The reconstruction waits until it is actionable and sees the same geometry on two consecutive polling observations.
+`UIWrapper.MFE(string)` means **Must Find Element**. It is intentionally more expensive and verifies rendered geometry/stability before returning.
 
-> This element is required to exist and be stable now.
+This avoids paying maximum synchronization cost for every lookup.
 
-That keeps the normal path cheap without weakening the cases that genuinely require stronger synchronization.
+## Smart selectors
 
-## Scoped locator chains
+The framework exposes a string-first authoring surface. `By` remains available as an overload, but callers are not required to encode Selenium locator mechanics throughout test code.
 
-```csharp
-var row = ui.Element(By.CssSelector("[data-user-id='42']"));
-var edit = row.Find(By.CssSelector("[data-action='edit']"));
+`VerifyPath` and `SimplifyLocator` own the translation between logical locator text and current Selenium strategies.
 
-edit.Click();
-```
+## Relative composition
 
-If either DOM node is replaced, the chain can be resolved again from the driver.
+`ConcatLocators` plus `XElement.FindElement` retain parent logical context when locating a descendant/relative element. Parent occurrence is included in the composed locator, so relative identity can be rebuilt after DOM replacement.
 
-## Readiness and stability
+## Runtime
 
-The reconstruction uses explicit polling via Selenium `WebDriverWait` rather than fixed sleeps. A required element is considered actionable when it is:
+`Global` carries framework-wide runtime concerns:
 
-- resolved;
-- displayed;
-- enabled;
-- rendered with non-zero area.
+- WebDriver/session ownership;
+- fail-closed test status;
+- synchronization defaults;
+- highlight/optimization diagnostics;
+- setup/teardown;
+- continuous state-preserving execution.
 
-The stronger stable path additionally requires identical geometry on consecutive observations.
-
-## Failure localization
-
-A recurring theme in the original framework was preventing a test from continuing far beyond the true cause of failure. An application-state precondition can prevent otherwise-valid selectors from executing on the wrong screen when similar controls exist in multiple places.
-
-`examples/PageStateGuard.cs` demonstrates the same general idea without employer-specific implementation.
-
-## Diagnostics, not hidden recovery
-
-The historical framework experimented with controlled fallbacks while emitting diagnostics. The public reconstruction is intentionally more conservative: stale references are re-resolved, but normal interaction failures are not silently converted into JavaScript interactions.
-
-That keeps recovery observable and avoids turning framework resilience into false confidence.
+This is why the project is better understood as automation architecture rather than an `IWebElement` wrapper.
