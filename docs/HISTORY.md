@@ -1,62 +1,33 @@
-# Historical lineage
+# Historical context
 
-## HElement → XElement
+The architecture began as **HElement** during Leeam Dagan's HELM-era automation work and later evolved into **XElement**.
 
-The architecture originated as **HElement** during the HELM era and later evolved into **XElement** as the framework moved into another application environment.
+The problem being solved was practical: raw Selenium `IWebElement` required individual test authors to manage too much DOM lifecycle, synchronization, locator and stale-reference behavior themselves.
 
-The important continuity was architectural, not a claim that every historical line of code was unchanged:
+The framework moved those responsibilities into a reusable logical-element layer and a surrounding automation runtime.
 
-- logical locator identity rather than disposable DOM identity;
-- current `IWebElement` held as replaceable state;
-- late resolution and stale re-resolution;
-- readiness-driven interaction;
-- fast normal lookup and a stronger must-exist path;
-- context-aware locator chaining;
-- centralized browser mechanics and diagnostics.
+## Surviving source snapshots
 
-The surviving early `sel` repository is a **transition snapshot** of the earlier HELM-era framework with targeted adaptations: selected feature upgrades, environment changes, and removal/reduction of application-specific functionality that was no longer relevant, including portions of the earlier Knockout-specific behavior.
+The surviving early `sel` repository is a transition snapshot of the earlier framework rather than a clean-room project beginning at that repository's first date.
 
-This public repository does **not** publish that historical source.
+It contains substantial earlier architecture plus targeted changes for a new application environment, including feature adjustments and removal/reduction of application-specific Knockout behavior that was no longer relevant.
 
-## Why the public code is a reconstruction
+The private historical source is intentionally not published here.
 
-The purpose of this repository is to demonstrate the engineering model without exposing employer source, application details, selectors, internal hostnames, customer information, credentials, or proprietary workflows.
+## Why the public source is reconstructed
 
-The implementation under `src/` was written as an employer-neutral modern reconstruction of the architectural ideas. It intentionally modernizes several mechanics while preserving the model.
+The public repository is intended to demonstrate the engineering architecture without exposing:
 
-## What changed in the modern reconstruction
+- employer-specific application code;
+- internal infrastructure/configuration;
+- credentials or historical secrets;
+- customer/workflow data;
+- source whose redistribution rights are uncertain.
 
-Historical mechanics deliberately not reproduced:
+The reconstruction therefore preserves architectural responsibilities, method names, authoring semantics and significant algorithms while replacing private/application-specific material with neutral equivalents.
 
-- string lifecycle states such as `CURRENT` / `STALE`;
-- global/static WebDriver ownership;
-- `Thread.Sleep()`-based polling;
-- parsing locator behavior from `By.ToString()`;
-- DOM sentinel elements used as unresolved state;
-- broad/empty exception catches;
-- test-framework assertions inside the element layer;
-- application-specific Knockout/model inspection in the core abstraction;
-- silent or automatic JavaScript click fallbacks.
+## Relationship to modern browser tooling
 
-Modern equivalents in this repository:
+Modern browser automation frameworks later made locator identity, late resolution, automatic waiting and actionability first-class concepts.
 
-- typed `ElementState`;
-- injected `IWebDriver` session ownership;
-- typed `By` objects inside a `LocatorChain`;
-- explicit unresolved state;
-- `WebDriverWait` polling and actionability checks;
-- explicit `XElementResolutionException`;
-- optional diagnostic sink;
-- application state handled outside the core element abstraction.
-
-## Historical outcome
-
-A representative HELM critical-path E2E workflow dropped from roughly **9 minutes to under 2 minutes** after the element model and synchronization approach were integrated and hardened. The point was not merely speed: the framework stopped paying conservative waits when the application was already ready.
-
-The same reliability philosophy later continued into deterministic test data, failure-preserving targeted retries, and higher-confidence CI failure signals in later work.
-
-## Relationship to modern tools
-
-Years later, modern browser-automation tools made several related ideas first-class: locator identity, late resolution, auto-waiting and actionability checks.
-
-This project does **not** claim to be an implementation or precursor of any specific modern framework. It documents an independent response to the same underlying problem encountered while engineering a large Selenium system.
+This repository does not claim lineage from or into those projects. HElement/XElement was an independent response to the same underlying automation problems encountered in a large Selenium suite.
