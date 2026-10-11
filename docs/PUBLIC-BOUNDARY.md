@@ -1,25 +1,41 @@
 # Public / IP boundary
 
-This repository is intentionally narrow.
+This repository is a sanitized architecture demonstration, not a dump of a historical employer repository.
 
-## Included
+## Preserved
 
-- employer-neutral architecture;
-- newly written demonstration code;
-- synthetic selectors and examples;
-- high-level historical design context;
-- public career outcomes already used in the portfolio/resume.
+The public reconstruction intentionally preserves:
 
-## Intentionally excluded
+- XElement's logical-element model;
+- UIWrapper's role and public lookup surface;
+- `FE`, `MFE` (Must Find Element), `FEs`;
+- string-first smart locator handling;
+- `VerifyPath` and `VerifyElement`;
+- locator retention and stale re-resolution;
+- occurrence/index preservation;
+- `SimplifyLocator`, `ReduceLocator` and conversion seams;
+- `ConcatLocators` and relative `FindElement` behavior;
+- generic Knockout `DataFor` inspection;
+- Global runtime responsibilities;
+- OPTIMIZE/HIGHLIGHT concepts;
+- state-preserving continuous execution;
+- high-level historical outcomes already used publicly in career material.
 
-- original employer repositories or source files;
-- internal application namespaces and class hierarchies;
-- internal URLs, hostnames or environment names;
-- customer data or identifiers;
-- credentials, tokens, secrets or configuration;
-- proprietary selectors, page models or business workflows;
-- employer-specific Knockout/view-model schemas;
-- historical binaries, browser extensions or build artifacts;
-- copied source from the private `Selenium` / `sel` repositories.
+## Removed or replaced
 
-If a future change needs historical source as a reference, the public implementation should be rewritten in employer-neutral form and reviewed against this boundary before publication.
+The public code intentionally excludes or neutralizes:
+
+- usernames/passwords/API keys/secrets;
+- personal or employer email addresses embedded in runtime code;
+- internal hostnames, IPs and environment URLs;
+- employer namespaces and application IDs;
+- customer-specific workflows and page models;
+- proprietary selectors and application schemas;
+- old executable/browser-driver binaries;
+- private configuration files;
+- old test assemblies;
+- source helpers with uncertain third-party provenance.
+
+## Important distinction
+
+Sanitization should remove sensitive **data and application coupling**, not erase the architecture being demonstrated.
